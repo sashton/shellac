@@ -18,8 +18,8 @@
   [name doc uses-stdin? handler]
   {:command        name
    :doc            doc
-   :uses-stdin?    false
-   :uses-commands? uses-stdin?
+   :uses-stdin?    uses-stdin?
+   :uses-commands? false
    :handler        handler})
 
 
@@ -35,16 +35,24 @@
    (super-command* "help"
                    "Shows docs for available commands"
                    false
-                   (fn [commands in [help-command]]
+                   (fn [commands _ [help-command]]
                      (if help-command
-                       (let [help-command (clojure.string/trim help-command)]
-                         (if-let [command (get commands help-command)]
-                           (do
-                             (println "Command: " help-command)
-                             (println "  Usage: " (:doc command)))
-                           (println "Unknown command: " help-command)))
+                       (if-let [command (get commands help-command)]
+                         (do
+                           (println "Command: " help-command)
+                           (println "  Usage: " (:doc command)))
+                         (println "Unknown command: " help-command))
                        (let [command-names (sort (keys commands))]
                          (println "Available commands:\n")
                          (doseq [c command-names]
                            (println "\t" c))
-                         (println "\nType 'help [command-name]' to get more information")))))})
+                         (println "\nType 'help [command-name]' to get more information")))))
+
+   "check-stdin"
+   (super-command* "check-stdin"
+                   "Determines whether a command requires stdin"
+                   false
+                   (fn [commands _ [command-name]]
+                     (if (get-in commands [command-name :uses-stdin?])
+                       (println "true")
+                       (println "false"))))})
