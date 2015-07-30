@@ -34,7 +34,7 @@
                         arg-count (Integer. (.readLine in))
                         ; The next 'n' lines are the arguments, collect them
                         args (doall (for [_ (range arg-count)]
-                                      (.readLine in)))]
+                                      (clojure.string/trim (.readLine in))))]
                     (if-let [command (get commands command-name)]
                       (let [handler (:handler command)
                             uses-commands? (:uses-commands? command)]
